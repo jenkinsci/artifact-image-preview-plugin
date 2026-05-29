@@ -1,0 +1,5 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+    <link rel="stylesheet" href="${rootURL}/plugin/artifact-image-preview/css/image-preview.css"/>
+    <script src="${rootURL}/plugin/artifact-image-preview/js/image-preview.js"/>
+</j:jelly>
