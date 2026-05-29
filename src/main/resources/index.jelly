@@ -1,0 +1,5 @@
+<?jelly escape-by-default='true'?>
+<div>
+    Preview image artifacts (PNG, JPG, JPEG, GIF, WebP, SVG, BMP) with thumbnails and hover-to-zoom in Jenkins build pages.
+    GIF animations play automatically on hover.
+</div>

@@ -1,0 +1,43 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>4.88</version>
+        <relativePath/>
+    </parent>
+    <groupId>io.jenkins.plugins</groupId>
+    <artifactId>artifact-image-preview</artifactId>
+    <version>1.0.0</version>
+    <packaging>hpi</packaging>
+    <name>Artifact Image Preview Plugin</name>
+    <description>Preview image artifacts (PNG, JPG, GIF, WebP, SVG, BMP) with thumbnails and hover-to-zoom in Jenkins build pages.</description>
+    <url>https://github.com/popingalex/artifact-image-preview</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/popingalex/artifact-image-preview.git</connection>
+        <developerConnection>scm:git:git@github.com:popingalex/artifact-image-preview.git</developerConnection>
+        <url>https://github.com/popingalex/artifact-image-preview</url>
+    </scm>
+    <properties>
+        <jenkins.version>2.440.3</jenkins.version>
+        <gitHubRepo>popingalex/artifact-image-preview</gitHubRepo>
+    </properties>
+    <repositories>
+        <repository>
+            <id>jenkins-public</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jenkins-public</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>
