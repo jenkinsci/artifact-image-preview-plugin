@@ -35,23 +35,6 @@ A Jenkins plugin that adds thumbnail previews and hover-to-zoom for image artifa
 4. `mouseenter`/`mousemove` shows a fixed popup; `mouseleave` hides it
 5. `MutationObserver` handles dynamically loaded content
 
-## Project Structure
-
-```
-artifact-image-preview/
-├── pom.xml
-├── Jenkinsfile
-├── src/main/
-│   ├── java/io/jenkins/plugins/artifactimagepreview/
-│   │   └── ImagePreviewPlugin.java
-│   └── resources/
-│       ├── index.jelly
-│       └── io/jenkins/plugins/artifactimagepreview/
-│           └── header.jelly
-├── docs/
-└── .gitignore
-```
-
 ## Requirements
 
 - Jenkins 2.440.3+
