@@ -1,63 +1,58 @@
-.img-preview-thumb {
-    display: inline-block;
+.img-preview-cell {
+    text-align: center;
     vertical-align: middle;
-    margin-left: 8px;
-    max-width: 60px;
-    max-height: 40px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    white-space: nowrap;
+    width: 2rem;
+    padding-inline-start: 0.25rem;
+    padding-inline-end: 0
+}
+.img-preview-thumb {
+    display: block;
+    inline-size: 1rem;
+    block-size: 1rem;
+    object-fit: contain;
+    border: 1px solid var(--input-border, currentColor);
+    border-radius: 2px;
+    background: transparent;
     cursor: pointer;
     transition: border-color 0.2s
 }
 .img-preview-thumb:hover {
-    border-color: #4a90d9
+    border-color: var(--link-color, currentColor)
 }
 .img-preview-thumb.is-gif {
-    border-color: #e6a23c
+    border-color: var(--warning-color, #e6a23c)
 }
 .img-preview-thumb.is-gif:hover {
-    border-color: #cf8b14
-}
-.img-preview-gif-badge {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 4px;
-    padding: 1px 5px;
-    font-size: 10px;
-    font-weight: bold;
-    color: #fff;
-    background: #e6a23c;
-    border-radius: 3px;
-    line-height: 1.4;
-    cursor: pointer;
-    user-select: none
+    border-color: var(--warning-hover-color, #cf8b14)
 }
 .img-preview-popup {
     display: none;
     position: fixed;
     z-index: 9999;
-    border: 2px solid #666;
-    border-radius: 6px;
+    border: 2px solid var(--input-border, #666);
+    border-radius: var(--form-input-border-radius, 6px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    background: #fff;
+    background: var(--card-background, var(--background, #fff));
+    color: var(--text-color, CanvasText);
     padding: 4px;
-    max-width: 90vw;
-    max-height: 90vh;
+    max-inline-size: 90vw;
+    max-block-size: 90vh;
     pointer-events: none
 }
 .img-preview-popup img {
     display: block;
-    max-width: 80vw;
-    max-height: 80vh
+    max-inline-size: 80vw;
+    max-block-size: 80vh
 }
 .img-preview-popup .gif-label {
     position: absolute;
     top: 8px;
-    right: 8px;
+    inset-inline-end: 8px;
     padding: 2px 8px;
     font-size: 11px;
     font-weight: bold;
-    color: #fff;
-    background: rgba(230,162,60,0.9);
-    border-radius: 3px
+    color: var(--text-color-inverse, #fff);
+    background: var(--warning-color, #e6a23c);
+    border-radius: var(--form-input-border-radius, 3px)
 }

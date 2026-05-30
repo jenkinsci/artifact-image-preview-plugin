@@ -2,6 +2,11 @@ target/
 *.class
 *.hpi
 *.jar
+minio-data/
+tmp/
+tools/
+docs/test-anim.gif
+.mvn/*.backup
 
 .idea/
 *.iml
@@ -19,4 +24,5 @@ target/
 node_cache/
 node_modules/
 work/
-refs/
+secrets/
+scripts/

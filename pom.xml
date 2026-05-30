@@ -8,11 +8,11 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>artifact-image-preview</artifactId>
-    <version>1.0.${changelist}</version>
+    <version>${changelist}</version>
     <packaging>hpi</packaging>
     <name>Artifact Image Preview Plugin</name>
-    <description>Preview image artifacts (PNG, JPG, GIF, WebP, SVG, BMP) with thumbnails and hover-to-zoom in Jenkins build pages.</description>
-    <url>https://github.com/popingalex/artifact-image-preview</url>
+    <description>Preview image artifacts (PNG, JPG, GIF, WebP, BMP) with thumbnails and hover-to-zoom in Jenkins build pages.</description>
+    <url>https://github.com/jenkinsci/artifact-image-preview-plugin</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -20,15 +20,15 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/popingalex/artifact-image-preview.git</connection>
-        <developerConnection>scm:git:git@github.com:popingalex/artifact-image-preview.git</developerConnection>
-        <url>https://github.com/popingalex/artifact-image-preview</url>
+        <connection>scm:git:https://github.com/jenkinsci/artifact-image-preview-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/artifact-image-preview-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/artifact-image-preview-plugin</url>
         <tag>${scmTag}</tag>
     </scm>
     <properties>
         <jenkins.baseline>2.528</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-        <gitHubRepo>popingalex/artifact-image-preview</gitHubRepo>
+        <gitHubRepo>jenkinsci/artifact-image-preview-plugin</gitHubRepo>
         <changelist>999999-SNAPSHOT</changelist>
         <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
         <ban-deprecated-stapler.skip>false</ban-deprecated-stapler.skip>

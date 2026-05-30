@@ -1,9 +1,10 @@
-(function(d){
+(function(d) {
+    'use strict';
     var popup = null;
     var popupImg = null;
     var popupLabel = null;
-    var IMAGE_EXTS = ['png','jpg','jpeg','gif','webp','svg','bmp'];
-    var ANIMATED_EXTS = ['gif'];
+    var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|bmp|avif)(?:[?#].*)?$/i;
+    var ANIMATED_EXTS = /\.(gif)(?:[?#].*)?$/i;
 
     function ensurePopup() {
         if (popup) return;
@@ -17,10 +18,26 @@
         d.body.appendChild(popup);
     }
 
-    function resolveUrl(href) {
-        if (href.startsWith('http')) return href;
-        var base = window.location.origin;
-        return base + (href.startsWith('/') ? '' : '/') + href;
+    function getArtifactImageUrl(link) {
+        var href = link.getAttribute('href');
+        if (!href) return null;
+
+        var url;
+        try {
+            url = new URL(href, document.baseURI);
+        } catch (e) {
+            return null;
+        }
+
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+        if (!url.pathname.includes('/artifact/')) return null;
+        if (!IMAGE_EXTENSIONS.test(url.pathname)) return null;
+
+        return url.href;
+    }
+
+    function isAnimatedUrl(url) {
+        return ANIMATED_EXTS.test(url);
     }
 
     function positionPopup(x, y) {
@@ -45,66 +62,59 @@
         if (popup) popup.style.display = 'none';
     }
 
-    function isImageLink(href) {
-        if (!href) return false;
-        var ext = href.split('.').pop().toLowerCase();
-        return IMAGE_EXTS.indexOf(ext) !== -1;
-    }
-
-    function isAnimatedExt(href) {
-        if (!href) return false;
-        var ext = href.split('.').pop().toLowerCase();
-        return ANIMATED_EXTS.indexOf(ext) !== -1;
-    }
-
     function processLink(link) {
         if (link.dataset.ip) return;
-        var href = link.getAttribute('href');
-        if (!isImageLink(href)) return;
+        var artifactImageUrl = getArtifactImageUrl(link);
+        if (!artifactImageUrl) return;
         link.dataset.ip = '1';
 
-        var url = resolveUrl(href);
-        var animated = isAnimatedExt(href);
+        var row = link.closest('tr');
+        var cell = link.closest('td');
+        var viewLink = row && row.querySelector('a[href$="/*view*/"]');
+        var viewCell = viewLink && viewLink.closest('td');
+        if (!cell || !row || !viewCell || row.dataset.ipPreview) return;
+        row.dataset.ipPreview = '1';
+
+        var animated = isAnimatedUrl(artifactImageUrl);
+
+        var thumbCell = d.createElement('td');
+        thumbCell.className = 'img-preview-cell';
 
         var thumb = d.createElement('img');
         thumb.className = 'img-preview-thumb' + (animated ? ' is-gif' : '');
-        thumb.src = url;
+        thumb.src = artifactImageUrl;
         thumb.alt = 'Preview';
+        thumb.title = animated ? 'GIF preview' : 'Preview';
+        thumb.loading = 'lazy';
+        thumb.decoding = 'async';
+        thumb.referrerPolicy = 'no-referrer';
         thumb.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            window.open(url, '_blank');
+            window.open(artifactImageUrl, '_blank');
         });
-        thumb.addEventListener('mouseenter', function(e) { showPopup(url, e.clientX, e.clientY, animated); });
-        thumb.addEventListener('mousemove', function(e) { showPopup(url, e.clientX, e.clientY, animated); });
+        thumb.addEventListener('mouseenter', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, animated); });
+        thumb.addEventListener('mousemove', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, animated); });
         thumb.addEventListener('mouseleave', hidePopup);
-        link.parentNode.insertBefore(thumb, link.nextSibling);
+        thumbCell.appendChild(thumb);
+        row.insertBefore(thumbCell, viewCell.nextSibling);
+    }
 
-        if (animated) {
-            var badge = d.createElement('span');
-            badge.className = 'img-preview-gif-badge';
-            badge.textContent = 'GIF';
-            badge.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.open(url, '_blank');
-            });
-            link.parentNode.insertBefore(badge, thumb.nextSibling);
-        }
+    function scanArtifactLinks(root) {
+        var scope = root || d;
+        scope.querySelectorAll('a[href]').forEach(processLink);
     }
 
     function init() {
-        d.querySelectorAll('a[href*="artifact/"]').forEach(processLink);
-    }
-
-    function setup() {
-        setTimeout(init, 500);
-        new MutationObserver(init).observe(d.body, {childList: true, subtree: true});
+        scanArtifactLinks(d);
+        window.setTimeout(function() {
+            scanArtifactLinks(d);
+        }, 1000);
     }
 
     if (d.readyState === 'loading') {
-        d.addEventListener('DOMContentLoaded', setup);
+        d.addEventListener('DOMContentLoaded', init);
     } else {
-        setup();
+        init();
     }
 })(document);

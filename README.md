@@ -5,7 +5,7 @@
 
 [中文文档](README_zh.md)
 
-A Jenkins plugin that adds thumbnail previews and hover-to-zoom for image artifacts on build pages.
+Image artifact thumbnails and hover-to-zoom preview on job and build pages. Install and use — no configuration.
 
 ## Demo
 
@@ -13,43 +13,29 @@ A Jenkins plugin that adds thumbnail previews and hover-to-zoom for image artifa
 
 ## Features
 
-- **Thumbnail Preview** — auto-displays thumbnails next to image artifact links
-- **Hover-to-Zoom** — hover a thumbnail to show a large popup preview
-- **GIF Animation** — GIF files get an orange border, "GIF" badge, and auto-play in popup
-- **Click to Open** — click any thumbnail to open full-size in new tab
-- **Formats** — PNG, JPG/JPEG, GIF, WebP, SVG, BMP
-- **Zero Config** — works automatically after installation
-- **Lightweight** — pure CSS + vanilla JS via `PageDecorator`, no dependencies
+- Thumbnails on job page (*Last Successful Artifacts*) and build page (*Build Artifacts*)
+- Hover a thumbnail for a large popup preview
+- GIF files: orange border, **GIF** badge, auto-play in popup
+- Click a thumbnail to open the full image in a new tab
+- PNG, JPG/JPEG, GIF, WebP, BMP
 
 ## Screenshots
 
-| Thumbnails | Hover Preview | GIF Hover |
+| Build Page | Job Page (Hover) | GIF (Hover) |
 |:---:|:---:|:---:|
-| ![Thumbnails](docs/screenshot-thumbnails.png) | ![Hover](docs/screenshot-hover-preview.png) | ![GIF](docs/screenshot-gif-hover.png) |
+| ![Build page](docs/screenshot-build-page.png) | ![Job page hover](docs/screenshot-job-hover.png) | ![GIF hover](docs/screenshot-gif-hover.png) |
 
-## How It Works
+## Install
 
-1. `ImagePreviewPlugin` extends `PageDecorator` → Jenkins loads `header.jelly` into every page
-2. JS scans `<a href*="artifact/">` links, filters by image extension
-3. Creates `<img>` thumbnails after each link; GIF files get orange border + "GIF" badge
-4. `mouseenter`/`mousemove` shows a fixed popup; `mouseleave` hides it
-5. `MutationObserver` handles dynamically loaded content
+Upload `artifact-image-preview.hpi` via **Manage Jenkins → Plugins → Advanced → Upload Plugin**, then restart.
 
-## Requirements
+Requires Jenkins 2.440.3+.
 
-- Jenkins 2.440.3+
-- Java 11+
-- Maven 3.8+
-
-## Build & Install
+Build from source:
 
 ```bash
 mvn clean package -DskipTests
 ```
-
-Upload `target/artifact-image-preview.hpi` via **Manage Jenkins → Plugins → Advanced → Upload Plugin**, then restart.
-
-Or manually copy to `$JENKINS_HOME/plugins/` and restart.
 
 ## License
 
