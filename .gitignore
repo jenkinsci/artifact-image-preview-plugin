@@ -1,28 +1,30 @@
+# Maven / Java
 target/
 *.class
 *.hpi
 *.jar
-minio-data/
-tmp/
-tools/
-docs/test-anim.gif
 .mvn/*.backup
+.settings/
+.project
+.classpath
 
+# IDE
 .idea/
 *.iml
 .vscode/
 
+# OS / editor
 .DS_Store
 *.swp
 *.swo
 *~
 
-.settings/
-.project
-.classpath
-
-node_cache/
+# Node
 node_modules/
-work/
-secrets/
+
+# Local development (Jenkins, MinIO, scripts, secrets — see .local/README.md)
 .local/
+
+# Generated assets
+docs/test-anim.gif
+node_cache/
