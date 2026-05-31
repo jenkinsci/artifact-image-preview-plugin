@@ -11,7 +11,7 @@
     <version>${changelist}</version>
     <packaging>hpi</packaging>
     <name>Artifact Image Preview Plugin</name>
-    <description>Preview image artifacts (PNG, JPG, GIF, WebP, BMP) with thumbnails and hover-to-zoom in Jenkins build pages.</description>
+    <description>Preview image artifacts (PNG, JPG, GIF, WebP) with thumbnails and hover-to-zoom in Jenkins build pages.</description>
     <url>https://github.com/jenkinsci/artifact-image-preview-plugin</url>
     <licenses>
         <license>

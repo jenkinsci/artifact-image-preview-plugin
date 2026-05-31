@@ -17,7 +17,7 @@ Image artifact thumbnails and hover-to-zoom preview on job and build pages. Inst
 - Hover a thumbnail for a large popup preview
 - GIF files: orange border, **GIF** badge, auto-play in popup
 - Click a thumbnail to open the full image in a new tab
-- PNG, JPG/JPEG, GIF, WebP, BMP
+- PNG, JPG/JPEG, GIF, WebP
 
 ## Screenshots
 
@@ -29,12 +29,10 @@ Image artifact thumbnails and hover-to-zoom preview on job and build pages. Inst
 
 Upload `artifact-image-preview.hpi` via **Manage Jenkins → Plugins → Advanced → Upload Plugin**, then restart.
 
-Requires Jenkins 2.440.3+.
-
 Build from source:
 
 ```bash
-mvn clean package -DskipTests
+mvn clean verify
 ```
 
 ## License

@@ -3,7 +3,8 @@
     var popup = null;
     var popupImg = null;
     var popupLabel = null;
-    var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|bmp|avif)(?:[?#].*)?$/i;
+    var DIRECTORY_BROWSER_MODEL = 'hudson.model.DirectoryBrowserSupport';
+    var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp)(?:[?#].*)?$/i;
     var ANIMATED_EXTS = /\.(gif)(?:[?#].*)?$/i;
 
     function ensurePopup() {
@@ -18,7 +19,19 @@
         d.body.appendChild(popup);
     }
 
-    function getArtifactImageUrl(link) {
+    function isDirectoryBrowserPage() {
+        return d.body && d.body.dataset && d.body.dataset.modelType === DIRECTORY_BROWSER_MODEL;
+    }
+
+    function isArtifactPath(pathname) {
+        return pathname.indexOf('/artifact/') !== -1;
+    }
+
+    function isArtifactDirectoryBrowserPage() {
+        return isDirectoryBrowserPage() && isArtifactPath(window.location.pathname);
+    }
+
+    function resolveSafeHttpUrl(link) {
         var href = link.getAttribute('href');
         if (!href) return null;
 
@@ -30,10 +43,27 @@
         }
 
         if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-        if (!url.pathname.includes('/artifact/')) return null;
-        if (!IMAGE_EXTENSIONS.test(url.pathname)) return null;
+        return url;
+    }
 
-        return url.href;
+    function isSupportedImagePath(pathname) {
+        return IMAGE_EXTENSIONS.test(pathname);
+    }
+
+    function getArtifactImageUrl(link) {
+        var url = resolveSafeHttpUrl(link);
+        if (!url) return null;
+        if (!isSupportedImagePath(url.pathname)) return null;
+
+        if (isArtifactDirectoryBrowserPage()) {
+            return url.href;
+        }
+
+        if (isArtifactPath(url.pathname)) {
+            return url.href;
+        }
+
+        return null;
     }
 
     function isAnimatedUrl(url) {
@@ -62,18 +92,41 @@
         if (popup) popup.style.display = 'none';
     }
 
-    function processLink(link) {
+    function getArtifactListRows(scope) {
+        var root = scope || d;
+        var rows = [];
+        root.querySelectorAll('table.fileList tr').forEach(function(row) {
+            if (row.querySelector('a[href$="/*view*/"]')) {
+                rows.push(row);
+            }
+        });
+        return rows;
+    }
+
+    function getArtifactFileLink(row) {
+        var links = row.querySelectorAll('a[href]:not([href$="/*view*/"])');
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            if (link.dataset.ip) continue;
+            var href = link.getAttribute('href');
+            if (!href || href.indexOf('/*zip*/') !== -1) continue;
+            var label = (link.textContent || '').trim();
+            if (label === '(all files in zip)') continue;
+            return link;
+        }
+        return null;
+    }
+
+    function processLink(link, row) {
         if (link.dataset.ip) return;
         var artifactImageUrl = getArtifactImageUrl(link);
         if (!artifactImageUrl) return;
-        link.dataset.ip = '1';
 
-        var row = link.closest('tr');
+        row = row || link.closest('tr');
         var cell = link.closest('td');
         var viewLink = row && row.querySelector('a[href$="/*view*/"]');
         var viewCell = viewLink && viewLink.closest('td');
         if (!cell || !row || !viewCell || row.dataset.ipPreview) return;
-        row.dataset.ipPreview = '1';
 
         var animated = isAnimatedUrl(artifactImageUrl);
 
@@ -98,11 +151,15 @@
         thumb.addEventListener('mouseleave', hidePopup);
         thumbCell.appendChild(thumb);
         row.insertBefore(thumbCell, viewCell.nextSibling);
+        link.dataset.ip = '1';
+        row.dataset.ipPreview = '1';
     }
 
     function scanArtifactLinks(root) {
-        var scope = root || d;
-        scope.querySelectorAll('a[href]').forEach(processLink);
+        getArtifactListRows(root).forEach(function(row) {
+            var link = getArtifactFileLink(row);
+            if (link) processLink(link, row);
+        });
     }
 
     function init() {
