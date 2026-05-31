@@ -17,7 +17,7 @@
 - 悬停缩略图弹出大图预览
 - GIF 文件：橙色边框、**GIF** 标签、弹窗内自动播放
 - 点击缩略图在新标签页打开原图
-- 支持 PNG、JPG/JPEG、GIF、WebP、BMP
+- 支持 PNG、JPG/JPEG、GIF、WebP
 
 ## 截图
 
@@ -29,12 +29,10 @@
 
 通过 **Manage Jenkins → Plugins → Advanced → Upload Plugin** 上传 `artifact-image-preview.hpi`，然后重启 Jenkins。
 
-需要 Jenkins 2.440.3+。
-
 从源码构建：
 
 ```bash
-mvn clean package -DskipTests
+mvn clean verify
 ```
 
 ## 许可证
