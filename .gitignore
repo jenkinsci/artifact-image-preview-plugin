@@ -25,4 +25,4 @@ node_cache/
 node_modules/
 work/
 secrets/
-scripts/
+.local/
