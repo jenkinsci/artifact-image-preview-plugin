@@ -1,4 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-    <st:adjunct includes="io.jenkins.plugins.artifactimagepreview.ImagePreviewPlugin.adjuncts.image-preview"/>
+    <j:if test="${it.onJobPage}">
+        <st:adjunct includes="io.jenkins.plugins.artifactimagepreview.ImagePreviewPlugin.adjuncts.image-preview"/>
+    </j:if>
 </j:jelly>
