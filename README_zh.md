@@ -11,13 +11,18 @@
 
 ![悬停预览演示](docs/demo-hover-preview.gif)
 
+### WebM 预览
+
+![WebM 悬停预览](docs/demo-webm-hover-preview.gif)
+
 ## 功能
 
 - 任务页（*Last Successful Artifacts*）与构建页（*Build Artifacts*）显示缩略图
 - 悬停缩略图弹出大图预览
 - GIF 文件：橙色边框、**GIF** 标签、弹窗内自动播放
+- WebM 文件：蓝色边框、**WEBM** 标签、弹窗内静音循环自动播放
 - 点击缩略图在新标签页打开原图
-- 支持 PNG、JPG/JPEG、GIF、WebP
+- 支持 PNG、JPG/JPEG、GIF、WebP、WebM
 
 ## 截图
 

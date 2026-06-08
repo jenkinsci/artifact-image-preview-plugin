@@ -11,13 +11,18 @@ Image artifact thumbnails and hover-to-zoom preview on job and build pages. Inst
 
 ![Hover Preview Demo](docs/demo-hover-preview.gif)
 
+### WebM preview
+
+![WebM hover preview](docs/demo-webm-hover-preview.gif)
+
 ## Features
 
 - Thumbnails on job page (*Last Successful Artifacts*) and build page (*Build Artifacts*)
 - Hover a thumbnail for a large popup preview
 - GIF files: orange border, **GIF** badge, auto-play in popup
+- WebM files: blue border, **WEBM** badge, auto-play loop in popup (no audio)
 - Click a thumbnail to open the full image in a new tab
-- PNG, JPG/JPEG, GIF, WebP
+- PNG, JPG/JPEG, GIF, WebP, WebM
 
 ## Screenshots
 

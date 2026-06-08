@@ -1,20 +1,21 @@
 (function(d) {
     'use strict';
     var popup = null;
-    var popupImg = null;
+    var popupMedia = null;
     var popupLabel = null;
     var DIRECTORY_BROWSER_MODEL = 'hudson.model.DirectoryBrowserSupport';
-    var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp)(?:[?#].*)?$/i;
-    var ANIMATED_EXTS = /\.(gif)(?:[?#].*)?$/i;
+    var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|webm)(?:[?#].*)?$/i;
+    var VIDEO_EXTS = /\.(webm)(?:[?#].*)?$/i;
 
     function ensurePopup() {
         if (popup) return;
         popup = d.createElement('div');
         popup.className = 'img-preview-popup';
-        popupImg = d.createElement('img');
-        popup.appendChild(popupImg);
+        popupMedia = d.createElement('div');
+        popupMedia.className = 'img-preview-popup-media';
+        popup.appendChild(popupMedia);
         popupLabel = d.createElement('span');
-        popupLabel.className = 'gif-label';
+        popupLabel.className = 'img-preview-label';
         popup.appendChild(popupLabel);
         d.body.appendChild(popup);
     }
@@ -50,6 +51,10 @@
         return IMAGE_EXTENSIONS.test(pathname);
     }
 
+    function isVideoUrl(url) {
+        return VIDEO_EXTS.test(url);
+    }
+
     function getArtifactImageUrl(link) {
         var url = resolveSafeHttpUrl(link);
         if (!url) return null;
@@ -66,10 +71,6 @@
         return null;
     }
 
-    function isAnimatedUrl(url) {
-        return ANIMATED_EXTS.test(url);
-    }
-
     function positionPopup(x, y) {
         var w = popup.offsetWidth;
         var h = popup.offsetHeight;
@@ -79,17 +80,42 @@
         popup.style.top = Math.max(10, top) + 'px';
     }
 
-    function showPopup(src, x, y, isAnimated) {
+    function clearPopupMedia() {
+        while (popupMedia.firstChild) {
+            popupMedia.removeChild(popupMedia.firstChild);
+        }
+    }
+
+    function showPopup(src, x, y, isVideo) {
         ensurePopup();
-        popupImg.src = src;
-        popupLabel.textContent = isAnimated ? 'GIF' : '';
-        popupLabel.style.display = isAnimated ? 'block' : 'none';
+        clearPopupMedia();
+        var el;
+        if (isVideo) {
+            el = d.createElement('video');
+            el.src = src;
+            el.autoplay = true;
+            el.loop = true;
+            el.muted = true;
+            el.controls = true;
+            el.playsInline = true;
+        } else {
+            el = d.createElement('img');
+            el.src = src;
+        }
+        popupMedia.appendChild(el);
+        var label = isVideo ? 'WEBM' : '';
+        popupLabel.textContent = label;
+        popupLabel.style.display = label ? 'block' : 'none';
+        popupMedia.className = 'img-preview-popup-media' + (isVideo ? ' is-video' : '');
         popup.style.display = 'block';
         positionPopup(x, y);
     }
 
     function hidePopup() {
-        if (popup) popup.style.display = 'none';
+        if (popup) {
+            popup.style.display = 'none';
+            clearPopupMedia();
+        }
     }
 
     function getArtifactListRows(scope) {
@@ -128,16 +154,28 @@
         var viewCell = viewLink && viewLink.closest('td');
         if (!cell || !row || !viewCell || row.dataset.ipPreview) return;
 
-        var animated = isAnimatedUrl(artifactImageUrl);
+        var isVideo = isVideoUrl(artifactImageUrl);
+        var animated = isVideo; // webm treated like gif for badge styling
 
         var thumbCell = d.createElement('td');
         thumbCell.className = 'img-preview-cell';
 
-        var thumb = d.createElement('img');
-        thumb.className = 'img-preview-thumb' + (animated ? ' is-gif' : '');
-        thumb.src = artifactImageUrl;
+        var thumb;
+        if (isVideo) {
+            thumb = d.createElement('video');
+            thumb.src = artifactImageUrl;
+            thumb.muted = true;
+            thumb.loop = true;
+            thumb.autoplay = true;
+            thumb.playsInline = true;
+        } else {
+            thumb = d.createElement('img');
+            thumb.src = artifactImageUrl;
+        }
+        var extraClass = isVideo ? ' is-video' : (animated ? ' is-gif' : '');
+        thumb.className = 'img-preview-thumb' + extraClass;
         thumb.alt = 'Preview';
-        thumb.title = animated ? 'GIF preview' : 'Preview';
+        thumb.title = isVideo ? 'WebM preview' : (animated ? 'GIF preview' : 'Preview');
         thumb.loading = 'lazy';
         thumb.decoding = 'async';
         thumb.referrerPolicy = 'no-referrer';
@@ -146,8 +184,8 @@
             e.stopPropagation();
             window.open(artifactImageUrl, '_blank');
         });
-        thumb.addEventListener('mouseenter', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, animated); });
-        thumb.addEventListener('mousemove', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, animated); });
+        thumb.addEventListener('mouseenter', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, isVideo); });
+        thumb.addEventListener('mousemove', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, isVideo); });
         thumb.addEventListener('mouseleave', hidePopup);
         thumbCell.appendChild(thumb);
         row.insertBefore(thumbCell, viewCell.nextSibling);
