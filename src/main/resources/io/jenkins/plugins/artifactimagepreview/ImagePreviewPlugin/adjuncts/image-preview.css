@@ -26,6 +26,12 @@
 .img-preview-thumb.is-gif:hover {
     border-color: var(--warning-hover-color, #cf8b14)
 }
+.img-preview-thumb.is-video {
+    border-color: var(--accent-color, #4a90e2)
+}
+.img-preview-thumb.is-video:hover {
+    border-color: var(--accent-color-hover, #357ab8)
+}
 .img-preview-popup {
     display: none;
     position: fixed;
@@ -40,12 +46,24 @@
     max-block-size: 90vh;
     pointer-events: none
 }
-.img-preview-popup img {
+.img-preview-popup-media {
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+.img-preview-popup-media img,
+.img-preview-popup-media video {
     display: block;
     max-inline-size: 80vw;
     max-block-size: 80vh
 }
-.img-preview-popup .gif-label {
+.img-preview-popup-media.is-video video {
+    inline-size: 80vw;
+    max-inline-size: 800px;
+    block-size: auto;
+    background: #000
+}
+.img-preview-popup .img-preview-label {
     position: absolute;
     top: 8px;
     inset-inline-end: 8px;
@@ -55,4 +73,7 @@
     color: var(--text-color-inverse, #fff);
     background: var(--warning-color, #e6a23c);
     border-radius: var(--form-input-border-radius, 3px)
+}
+.img-preview-popup-media.is-video ~ .img-preview-label {
+    background: var(--accent-color, #4a90e2)
 }
