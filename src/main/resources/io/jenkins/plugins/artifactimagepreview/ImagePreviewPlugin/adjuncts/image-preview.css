@@ -43,8 +43,7 @@
     color: var(--text-color, CanvasText);
     padding: 4px;
     max-inline-size: 90vw;
-    max-block-size: 90vh;
-    pointer-events: none
+    max-block-size: 90vh
 }
 .img-preview-popup-media {
     display: flex;
