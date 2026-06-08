@@ -3,6 +3,11 @@
     var popup = null;
     var popupMedia = null;
     var popupLabel = null;
+    var mediaCache = Object.create(null); // url -> media element
+    var currentUrl = null;
+    var hideTimer = null;
+    var HIDE_DELAY_MS = 350;
+    var POPUP_GAP = 8;
     var DIRECTORY_BROWSER_MODEL = 'hudson.model.DirectoryBrowserSupport';
     var IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|webm)(?:[?#].*)?$/i;
     var VIDEO_EXTS = /\.(webm)(?:[?#].*)?$/i;
@@ -18,6 +23,12 @@
         popupLabel.className = 'img-preview-label';
         popup.appendChild(popupLabel);
         d.body.appendChild(popup);
+
+        // mouseenter/mouseleave on the popup itself: do not bubble, so they fire
+        // only when the cursor truly enters/leaves the popup (not when moving
+        // between child elements like the video control bar).
+        popup.addEventListener('mouseenter', cancelHide);
+        popup.addEventListener('mouseleave', scheduleHide);
     }
 
     function isDirectoryBrowserPage() {
@@ -71,50 +82,101 @@
         return null;
     }
 
-    function positionPopup(x, y) {
-        var w = popup.offsetWidth;
-        var h = popup.offsetHeight;
-        var left = Math.min(x + 15, window.innerWidth - w - 10);
-        var top = Math.min(y + 15, window.innerHeight - h - 10);
-        popup.style.left = Math.max(10, left) + 'px';
-        popup.style.top = Math.max(10, top) + 'px';
-    }
+    function positionPopupForThumb(thumb) {
+        if (!popup || !thumb) return;
+        var r = thumb.getBoundingClientRect();
+        // measure after content is in the DOM
+        var pw = popup.offsetWidth;
+        var ph = popup.offsetHeight;
+        var vh = window.innerHeight;
+        var vw = window.innerWidth;
+        var left, top;
 
-    function clearPopupMedia() {
-        while (popupMedia.firstChild) {
-            popupMedia.removeChild(popupMedia.firstChild);
+        // prefer right of thumb, flip left if no room
+        if (r.right + POPUP_GAP + pw <= vw - 10) {
+            left = r.right + POPUP_GAP;
+        } else if (r.left - POPUP_GAP - pw >= 10) {
+            left = r.left - POPUP_GAP - pw;
+        } else {
+            // fallback: right side, clamped
+            left = Math.min(r.right + POPUP_GAP, vw - pw - 10);
         }
+        left = Math.max(10, left);
+
+        // vertically center on thumb, clamp to viewport
+        top = r.top + r.height / 2 - ph / 2;
+        top = Math.max(10, Math.min(top, vh - ph - 10));
+
+        popup.style.left = left + 'px';
+        popup.style.top = top + 'px';
     }
 
-    function showPopup(src, x, y, isVideo) {
-        ensurePopup();
-        clearPopupMedia();
+    function buildMediaElement(url, isVideo) {
         var el;
         if (isVideo) {
             el = d.createElement('video');
-            el.src = src;
+            el.src = url;
             el.autoplay = true;
             el.loop = true;
             el.muted = true;
             el.controls = true;
             el.playsInline = true;
+            el.preload = 'auto';
         } else {
             el = d.createElement('img');
-            el.src = src;
+            el.src = url;
         }
-        popupMedia.appendChild(el);
-        var label = isVideo ? 'WEBM' : '';
-        popupLabel.textContent = label;
-        popupLabel.style.display = label ? 'block' : 'none';
-        popupMedia.className = 'img-preview-popup-media' + (isVideo ? ' is-video' : '');
-        popup.style.display = 'block';
-        positionPopup(x, y);
+        return el;
     }
 
-    function hidePopup() {
-        if (popup) {
-            popup.style.display = 'none';
-            clearPopupMedia();
+    function attachMedia(url, isVideo) {
+        var el = mediaCache[url];
+        if (!el) {
+            el = buildMediaElement(url, isVideo);
+            mediaCache[url] = el;
+        }
+        if (popupMedia.firstChild !== el) {
+            while (popupMedia.firstChild) popupMedia.removeChild(popupMedia.firstChild);
+            popupMedia.appendChild(el);
+        }
+        return el;
+    }
+
+    function showPopup(thumb, url, isVideo) {
+        ensurePopup();
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+            hideTimer = null;
+        }
+        if (currentUrl !== url) {
+            attachMedia(url, isVideo);
+            currentUrl = url;
+            popupMedia.className = 'img-preview-popup-media' + (isVideo ? ' is-video' : '');
+            var label = isVideo ? 'WEBM' : '';
+            popupLabel.textContent = label;
+            popupLabel.style.display = label ? 'block' : 'none';
+            popup.style.display = 'block';
+            positionPopupForThumb(thumb);
+        } else {
+            // same url: keep element, just ensure visible and re-anchor (in case of scroll)
+            popup.style.display = 'block';
+        }
+    }
+
+    function scheduleHide() {
+        if (hideTimer) clearTimeout(hideTimer);
+        hideTimer = setTimeout(function() {
+            if (popup) {
+                popup.style.display = 'none';
+            }
+            hideTimer = null;
+        }, HIDE_DELAY_MS);
+    }
+
+    function cancelHide() {
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+            hideTimer = null;
         }
     }
 
@@ -184,9 +246,10 @@
             e.stopPropagation();
             window.open(artifactImageUrl, '_blank');
         });
-        thumb.addEventListener('mouseenter', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, isVideo); });
-        thumb.addEventListener('mousemove', function(e) { showPopup(artifactImageUrl, e.clientX, e.clientY, isVideo); });
-        thumb.addEventListener('mouseleave', hidePopup);
+        thumb.addEventListener('mouseenter', function() {
+            showPopup(thumb, artifactImageUrl, isVideo);
+        });
+        thumb.addEventListener('mouseleave', scheduleHide);
         thumbCell.appendChild(thumb);
         row.insertBefore(thumbCell, viewCell.nextSibling);
         link.dataset.ip = '1';
